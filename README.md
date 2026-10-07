@@ -1,4 +1,4 @@
-# Banking Live Coding Interview
+# Banking Coding Project
 
 Projek Spring Boot 3.2 + Java 17.
 
