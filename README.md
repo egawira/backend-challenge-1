@@ -1,6 +1,6 @@
 # Banking Live Coding Interview
 
-Projek Spring Boot 3.2 + Java 17 untuk live coding interview Java Developer (junior to middle) di industri perbankan.
+Projek Spring Boot 3.2 + Java 17.
 
 Database menggunakan **H2 in-memory** dengan sample data yang sudah disediakan.
 
