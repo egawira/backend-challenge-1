@@ -1,9 +1,24 @@
 package com.bank.interview.dto;
 
-// TODO Part 1: add validation annotations
-// amount must be > 0
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotNull;
+
+import java.math.BigDecimal;
 
 public class DepositRequest {
 
-    // TODO Part 1: add field, getter, and setter
+    @NotNull(message = "Amount must not be null")
+    @DecimalMin(value = "0.0", inclusive = false, message = "Amount must be greater than 0")
+    private BigDecimal amount;
+
+    public DepositRequest() {
+    }
+
+    public BigDecimal getAmount() {
+        return amount;
+    }
+
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
+    }
 }

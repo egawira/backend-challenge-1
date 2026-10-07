@@ -29,16 +29,37 @@ class AccountServiceTest {
 
     @Test
     void createAccount_shouldReturnSavedAccount() {
-        // TODO Part 6 (bonus): write test for createAccount
+        AccountRequest request = new AccountRequest();
+        request.setAccountNumber("4444444444");
+        request.setAccountHolderName("Diana Putri");
+        request.setInitialBalance(new BigDecimal("75000"));
+        request.setAccountType("SAVINGS");
+
+        Account saved = new Account("4444444444", "Diana Putri", new BigDecimal("75000"), "SAVINGS");
+        when(accountRepository.save(any(Account.class))).thenReturn(saved);
+
+        Account result = accountService.createAccount(request);
+
+        assertNotNull(result);
+        assertEquals("4444444444", result.getAccountNumber());
+        assertEquals("Diana Putri", result.getAccountHolderName());
+        assertEquals(new BigDecimal("75000"), result.getBalance());
+        assertEquals("SAVINGS", result.getAccountType());
     }
 
     @Test
     void getAccount_whenNotFound_shouldThrow() {
-        // TODO Part 6 (bonus): verify AccountNotFoundException is thrown when findById returns empty
+        when(accountRepository.findById("9999999999")).thenReturn(Optional.empty());
+
+        assertThrows(AccountNotFoundException.class, () -> accountService.getAccount("9999999999"));
     }
 
     @Test
     void withdraw_whenInsufficientBalance_shouldThrow() {
-        // TODO Part 6 (bonus): verify InsufficientBalanceException is thrown
+        Account account = new Account("2222222222", "Bob Santoso", new BigDecimal("50000"), "SAVINGS");
+        when(accountRepository.findById("2222222222")).thenReturn(Optional.of(account));
+
+        assertThrows(InsufficientBalanceException.class,
+                () -> accountService.withdraw("2222222222", new BigDecimal("100000")));
     }
 }
