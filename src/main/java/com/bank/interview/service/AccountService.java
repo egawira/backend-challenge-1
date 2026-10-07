@@ -23,26 +23,67 @@ public class AccountService {
     }
 
     public Account createAccount(AccountRequest request) {
-        // TODO Part 2: create new Account, log the creation, and save it via repository
-        return null;
+        BigDecimal initialBalance = request.getInitialBalance() != null
+                ? request.getInitialBalance()
+                : BigDecimal.ZERO;
+
+        Account account = new Account(
+                request.getAccountNumber(),
+                request.getAccountHolderName(),
+                initialBalance,
+                request.getAccountType()
+        );
+
+        log.info("Creating account {} for holder {}", account.getAccountNumber(), account.getAccountHolderName());
+
+        Account saved = accountRepository.save(account);
+        log.info("Account {} created successfully with balance {}", saved.getAccountNumber(), saved.getBalance());
+        return saved;
     }
 
     public Account getAccount(String accountNumber) {
-        // TODO Part 2: find account by accountNumber or throw AccountNotFoundException
-        return null;
+        return accountRepository.findById(accountNumber)
+                .orElseThrow(() -> new AccountNotFoundException(accountNumber));
     }
 
     public Account deposit(String accountNumber, BigDecimal amount) {
-        // TODO Part 2: validate amount > 0, find account, add amount, save and return
-        return null;
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("Deposit amount must be greater than 0");
+        }
+
+        Account account = getAccount(accountNumber);
+        BigDecimal newBalance = account.getBalance().add(amount);
+        account.setBalance(newBalance);
+
+        log.info("Deposited {} to account {}. New balance: {}", amount, accountNumber, newBalance);
+        return accountRepository.save(account);
     }
 
     public Account withdraw(String accountNumber, BigDecimal amount) {
-        // TODO Part 2: validate amount > 0, find account, check balance, subtract amount, save and return
-        return null;
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("Withdrawal amount must be greater than 0");
+        }
+
+        Account account = getAccount(accountNumber);
+        if (account.getBalance().compareTo(amount) < 0) {
+            throw new InsufficientBalanceException(accountNumber);
+        }
+
+        BigDecimal newBalance = account.getBalance().subtract(amount);
+        account.setBalance(newBalance);
+
+        log.info("Withdrew {} from account {}. New balance: {}", amount, accountNumber, newBalance);
+        return accountRepository.save(account);
     }
 
     public void transfer(String fromAccountNumber, String toAccountNumber, BigDecimal amount) {
-        // TODO Part 3 (optional/bonus): validate, withdraw from source, deposit to target
+        if (fromAccountNumber != null && fromAccountNumber.equals(toAccountNumber)) {
+            throw new IllegalArgumentException("Cannot transfer to the same account");
+        }
+
+        withdraw(fromAccountNumber, amount);
+        deposit(toAccountNumber, amount);
+
+        log.info("Transferred {} from account {} to account {}", amount, fromAccountNumber, toAccountNumber);
     }
 }
